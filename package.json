@@ -1,0 +1,27 @@
+{
+  "name": "subscription-api-graphql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/bennaaym/subscription-api-graphql.git",
+  "author": "bennaaym <mr.aymen.bennabi@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start:dev": "nodemon --watch ./**/*.ts --exec ts-node ./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/validator": "^13.7.3",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@types/jsonwebtoken": "^8.5.8",
+    "apollo-server": "^3.9.0",
+    "bcrypt": "^5.0.1",
+    "dotenv": "^16.0.1",
+    "graphql": "^16.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.4.0",
+    "validator": "^13.7.0"
+  }
+}
