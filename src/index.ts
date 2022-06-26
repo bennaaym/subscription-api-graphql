@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { resolvers } from "./resolvers";
 import { typeDefs } from "./schemas";
+import { getUserFromToken } from "./utils/getUserFromToken";
 
 dotenv.config();
 
@@ -15,7 +16,13 @@ dotenv.config();
     const server = new ApolloServer({
       typeDefs,
       resolvers,
-      context: {},
+      context: ({ req }) => {
+        const accessToken = req.headers.authorization?.split(" ")[1];
+        const userInfo = getUserFromToken(accessToken as any);
+        return {
+          userInfo,
+        };
+      },
     });
 
     // run graphql server

@@ -19,6 +19,10 @@ interface ISignIn {
   password: string;
 }
 
+interface ISignOut {
+  refreshToken: string;
+}
+
 // utilities
 const signAccessToken = (userId: string) =>
   JWT.sign({ userId }, `${process.env.JWT_ACCESS_TOKEN_SECRET}`, {
@@ -101,6 +105,68 @@ export const AuthMutation = {
         accessToken: null,
         refreshToken: null,
         userErrors: [{ message: "Invalid credentials" }],
+      };
+    }
+  },
+
+  signOut: async (_: any, { refreshToken }: ISignOut, __: any) => {
+    try {
+      // check if the token is valid
+      const { userId } = JWT.verify(
+        refreshToken,
+        `${process.env.JWT_REFRESH_TOKEN_SECRET}`
+      ) as { userId: number };
+
+      const user = await User.findById(userId);
+
+      if (!user) throw new Error();
+
+      if (user.refreshToken !== refreshToken) throw new Error();
+
+      user.refreshToken = "";
+      await user.save();
+
+      return {
+        accessToken: null,
+        refreshToken: null,
+        userErrors: [],
+      };
+    } catch (err: any) {
+      return {
+        accessToken: null,
+        refreshToken: null,
+        userErrors: [{ message: "Error occurred while signing out" }],
+      };
+    }
+  },
+
+  refresh: async (_: any, { refreshToken }: ISignOut, __: any) => {
+    try {
+      // check if the token is valid
+      const { userId } = JWT.verify(
+        refreshToken,
+        `${process.env.JWT_REFRESH_TOKEN_SECRET}`
+      ) as { userId: number };
+
+      const user = await User.findById(userId);
+
+      if (!user) throw new Error();
+
+      if (user.refreshToken !== refreshToken) throw new Error();
+
+      user.refreshToken = signRefreshToken(`${user._id}`);
+      await user.save();
+
+      return {
+        accessToken: signAccessToken(`${user._id}`),
+        refreshToken: user.refreshToken,
+        userErrors: [],
+      };
+    } catch (err: any) {
+      return {
+        accessToken: null,
+        refreshToken: null,
+        userErrors: [{ message: "Invalid refresh token" }],
       };
     }
   },

@@ -7,6 +7,8 @@ export const typeDefs = gql`
   type Mutation {
     signUp(name: String!, email: String!, password: String!): AuthPayload!
     signIn(email: String!, password: String!): AuthPayload!
+    signOut(refreshToken: String!): AuthPayload!
+    refresh(refreshToken: String!): AuthPayload!
   }
 
   """
