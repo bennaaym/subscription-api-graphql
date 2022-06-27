@@ -9,6 +9,9 @@ export const typeDefs = gql`
     signIn(email: String!, password: String!): AuthPayload!
     signOut(refreshToken: String!): AuthPayload!
     refresh(refreshToken: String!): AuthPayload!
+
+    stripeGetSubscriptionPlan: StripePayload!
+    stripeCreateSession(priceId: String!): StripePayload!
   }
 
   """
@@ -17,13 +20,24 @@ export const typeDefs = gql`
   type AuthPayload {
     accessToken: String
     refreshToken: String
-    userErrors: [UserError!]!
+    errors: [Error!]!
   }
 
-  """
-  Errors
-  """
-  type UserError {
+  type StripePayload {
+    plans: [Plan!]
+    sessionUrl: String
+    errors: [Error!]!
+  }
+
+  type Plan {
+    priceId: ID!
+    productId: ID!
+    name: String!
+    price: Float!
+    currency: String!
+  }
+
+  type Error {
     message: String!
   }
 `;

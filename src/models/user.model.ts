@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import JWT from "jsonwebtoken";
 
 export interface UserDoc extends Document {
   name: string;
   email: string;
   password: string;
+  stripeCustomerId: string;
   refreshToken: string;
   createdAt: Date;
   matchPassword: (password: string, hashedPassword: string) => Promise<boolean>;
@@ -37,7 +37,10 @@ const userSchema = new mongoose.Schema<UserDoc>({
     required: true,
     min: [8, "Password must have 8 characters or more"],
   },
-
+  stripeCustomerId: {
+    type: String,
+    required: true,
+  },
   refreshToken: String,
 
   createdAt: {

@@ -1,11 +1,12 @@
 import { User } from "../../models";
 import JWT from "jsonwebtoken";
 import { ObjectId } from "mongoose";
+import { stripe } from "../../stripe";
 // types
 interface IAuthResponse {
   accessToken: string | null;
   refreshToken: string | null;
-  userErrors: { message: string }[];
+  errors: { message: string }[];
 }
 
 interface ISignUp {
@@ -40,10 +41,18 @@ export const AuthMutation = {
     __: any
   ): Promise<IAuthResponse> => {
     try {
+      const customer = await stripe.customers.create(
+        {
+          email,
+        },
+        { apiKey: `${process.env.STRIPE_SECRET_KEY}` }
+      );
+
       let newUser = await User.create({
         name,
         email,
         password,
+        stripeCustomerId: customer.id,
       });
 
       //create refresh token
@@ -53,13 +62,13 @@ export const AuthMutation = {
       return {
         accessToken: signAccessToken(`${newUser._id}`),
         refreshToken: `${newUser?.refreshToken}`,
-        userErrors: [],
+        errors: [],
       };
     } catch (err: any) {
       return {
         accessToken: null,
         refreshToken: null,
-        userErrors: [{ message: err.message }],
+        errors: [{ message: err.message }],
       };
     }
   },
@@ -72,7 +81,7 @@ export const AuthMutation = {
         return {
           accessToken: null,
           refreshToken: null,
-          userErrors: [{ message: "Invalid credentials" }],
+          errors: [{ message: "Invalid credentials" }],
         };
       }
 
@@ -86,7 +95,7 @@ export const AuthMutation = {
         return {
           accessToken: null,
           refreshToken: null,
-          userErrors: [{ message: "Invalid credentials" }],
+          errors: [{ message: "Invalid credentials" }],
         };
       }
 
@@ -98,13 +107,13 @@ export const AuthMutation = {
       return {
         accessToken: signAccessToken(`${user._id}`),
         refreshToken: user.refreshToken,
-        userErrors: [],
+        errors: [],
       };
     } catch (err: any) {
       return {
         accessToken: null,
         refreshToken: null,
-        userErrors: [{ message: "Invalid credentials" }],
+        errors: [{ message: "Invalid credentials" }],
       };
     }
   },
@@ -129,13 +138,13 @@ export const AuthMutation = {
       return {
         accessToken: null,
         refreshToken: null,
-        userErrors: [],
+        errors: [],
       };
     } catch (err: any) {
       return {
         accessToken: null,
         refreshToken: null,
-        userErrors: [{ message: "Error occurred while signing out" }],
+        errors: [{ message: "Error occurred while signing out" }],
       };
     }
   },
@@ -160,13 +169,13 @@ export const AuthMutation = {
       return {
         accessToken: signAccessToken(`${user._id}`),
         refreshToken: user.refreshToken,
-        userErrors: [],
+        errors: [],
       };
     } catch (err: any) {
       return {
         accessToken: null,
         refreshToken: null,
-        userErrors: [{ message: "Invalid refresh token" }],
+        errors: [{ message: "Invalid refresh token" }],
       };
     }
   },
