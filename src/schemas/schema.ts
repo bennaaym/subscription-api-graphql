@@ -1,7 +1,7 @@
 import { gql } from "apollo-server";
 export const typeDefs = gql`
   type Query {
-    hello: String
+    articles: ArticlePayload!
   }
 
   type Mutation {
@@ -12,6 +12,14 @@ export const typeDefs = gql`
 
     stripeGetSubscriptionPlan: StripePayload!
     stripeCreateSession(priceId: String!): StripePayload!
+  }
+
+  type Article {
+    id: ID!
+    title: String!
+    content: String!
+    imageUrl: String!
+    access: EArticle!
   }
 
   """
@@ -37,7 +45,21 @@ export const typeDefs = gql`
     currency: String!
   }
 
+  type ArticlePayload {
+    articles: [Article!]!
+    errors: [Error!]!
+  }
+
   type Error {
     message: String!
+  }
+
+  """
+  Enums
+  """
+  enum EArticle {
+    Basic
+    Standard
+    Premium
   }
 `;
